@@ -9,11 +9,30 @@ import {
   type Seat
 } from "../api/library";
 
+interface TimeSlotPreset {
+  label: string;
+  startTime: string;
+  endTime: string;
+}
+
+function formatLocalDate(reference = new Date()): string {
+  const offset = reference.getTimezoneOffset() * 60_000;
+  return new Date(reference.getTime() - offset).toISOString().slice(0, 10);
+}
+
+const timeSlotPresets: TimeSlotPreset[] = [
+  { label: "上午 08:00-10:00", startTime: "08:00", endTime: "10:00" },
+  { label: "上午 10:00-12:00", startTime: "10:00", endTime: "12:00" },
+  { label: "下午 14:00-16:00", startTime: "14:00", endTime: "16:00" },
+  { label: "下午 16:00-18:00", startTime: "16:00", endTime: "18:00" },
+  { label: "晚上 19:00-21:00", startTime: "19:00", endTime: "21:00" }
+];
+
 const rooms = ref<Room[]>([]);
 const seats = ref<Seat[]>([]);
 const selectedRoomId = ref<number | null>(null);
 const selectedSeatId = ref<number | null>(null);
-const reserveDate = ref(new Date().toISOString().slice(0, 10));
+const reserveDate = ref(formatLocalDate());
 const startTime = ref("09:00");
 const endTime = ref("11:00");
 const message = ref("");
@@ -21,6 +40,13 @@ const loading = ref(false);
 
 const selectedRoom = computed(
   () => rooms.value.find((room) => room.id === selectedRoomId.value) ?? null
+);
+
+const activePreset = computed(
+  () =>
+    timeSlotPresets.find(
+      (preset) => preset.startTime === startTime.value && preset.endTime === endTime.value
+    ) ?? null
 );
 
 async function loadRooms() {
@@ -48,6 +74,11 @@ async function loadSeats() {
   }
 }
 
+function applyPreset(preset: TimeSlotPreset) {
+  startTime.value = preset.startTime;
+  endTime.value = preset.endTime;
+}
+
 onMounted(async () => {
   await loadRooms();
   await loadSeats();
@@ -59,7 +90,7 @@ watch([selectedRoomId, reserveDate, startTime, endTime], async () => {
 
 async function submitReservation() {
   if (!selectedSeatId.value) {
-    message.value = "请先选择一个可用座位。";
+    message.value = "请选择一个可用座位。";
     return;
   }
 
@@ -87,7 +118,7 @@ async function submitReservation() {
     <section class="page-header">
       <div>
         <p class="eyebrow">座位预约</p>
-        <h2>选择阅览室、时间段和座位</h2>
+        <h2>选择阅览室、时段和座位</h2>
       </div>
 
       <button class="primary-button" type="button" @click="submitReservation" :disabled="loading">
@@ -123,6 +154,25 @@ async function submitReservation() {
         <span>结束</span>
         <input v-model="endTime" type="time" />
       </label>
+
+      <div class="time-slot-presets">
+        <span class="preset-label">快捷时段</span>
+        <div class="preset-list">
+          <button
+            v-for="preset in timeSlotPresets"
+            :key="preset.label"
+            type="button"
+            class="preset-button"
+            :class="{ active: activePreset?.label === preset.label }"
+            @click="applyPreset(preset)"
+          >
+            {{ preset.label }}
+          </button>
+        </div>
+        <p class="muted">
+          {{ activePreset ? "已选 " + activePreset.label : "可直接输入自定义时段。" }}
+        </p>
+      </div>
     </section>
 
     <section class="content-band">

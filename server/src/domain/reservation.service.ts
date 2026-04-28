@@ -334,7 +334,11 @@ export function listMyReservations(db: AppDatabase, userId: number): Reservation
 }
 
 export function markExpiredReservations(db: AppDatabase): number {
-  const currentDate = todayDate();
+  const now = new Date();
+  const currentDate = todayDate(now);
+  const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(
+    now.getMinutes()
+  ).padStart(2, "0")}`;
   const result = db
     .prepare(
       `
@@ -343,10 +347,10 @@ export function markExpiredReservations(db: AppDatabase): number {
         WHERE status = 'reserved'
           AND (
             reserve_date < ?
-            OR (reserve_date = ? AND end_time <= time('now'))
+            OR (reserve_date = ? AND end_time <= ?)
           )
       `
     )
-    .run(currentDate, currentDate);
+    .run(currentDate, currentDate, currentTime);
   return result.changes;
 }

@@ -401,6 +401,39 @@ label span {
   min-width: 150px;
 }
 
+.time-slot-presets {
+  display: grid;
+  gap: 0.45rem;
+  flex: 1 1 320px;
+  min-width: min(100%, 360px);
+}
+
+.preset-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.preset-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset-button {
+  min-height: 36px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+}
+
+.preset-button.active {
+  border-color: var(--accent);
+  background: rgba(15, 118, 110, 0.08);
+  color: var(--accent-strong);
+}
+
 .status-pill {
   margin-top: 0.35rem;
   display: inline-flex;

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { createDatabase } from "../src/db.js";
-import { reserveSeat } from "../src/domain/reservation.service.js";
+import { markExpiredReservations, reserveSeat } from "../src/domain/reservation.service.js";
 
 describe("reservation.service", () => {
   let db: ReturnType<typeof createDatabase>;
@@ -47,5 +47,39 @@ describe("reservation.service", () => {
         endTime: "11:00"
       })
     ).toThrowError("SEAT_SLOT_CONFLICT");
+  });
+
+  it("marks past reserved rows as expired", () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const reserveDate = yesterday.toISOString().slice(0, 10);
+
+    db.prepare(
+      `
+        INSERT INTO reservations (
+          user_id,
+          room_id,
+          seat_id,
+          reserve_date,
+          start_time,
+          end_time,
+          status,
+          checkin_at,
+          checkout_at,
+          cancelled_at,
+          created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, 'reserved', NULL, NULL, NULL, ?)
+      `
+    ).run(1, 1, 10, reserveDate, "08:00", "09:00", new Date().toISOString());
+
+    const changes = markExpiredReservations(db);
+
+    expect(changes).toBe(1);
+
+    const reservation = db
+      .prepare("SELECT status FROM reservations WHERE seat_id = ?")
+      .get(10) as { status: string };
+    expect(reservation.status).toBe("expired");
   });
 });

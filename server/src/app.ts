@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import type { AppDatabase } from "./db.js";
 import { JWT_SECRET } from "./domain/auth.service.js";
+import { markExpiredReservations } from "./domain/reservation.service.js";
 import { createAdminRouter } from "./routes/admin.routes.js";
 import { createAuthRouter } from "./routes/auth.routes.js";
 import { createStudentRouter } from "./routes/student.routes.js";
@@ -18,6 +19,10 @@ export function createApp(options: CreateAppOptions): express.Express {
 
   app.use(cors());
   app.use(express.json());
+  app.use((_req, _res, next) => {
+    markExpiredReservations(options.db);
+    next();
+  });
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok" });
