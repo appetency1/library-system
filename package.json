@@ -1,0 +1,40 @@
+{
+  "name": "library-seat-reservation-system",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:web\" \"npm:dev:api\"",
+    "dev:web": "vite --config client/vite.config.ts",
+    "dev:api": "tsx watch server/src/index.ts",
+    "build": "npm run build:web && npm run build:api",
+    "build:web": "vite build --config client/vite.config.ts",
+    "build:api": "tsc -p server/tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^11.9.1",
+    "cors": "^2.8.5",
+    "echarts": "^5.6.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pinia": "^3.0.2",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.15.21",
+    "@types/supertest": "^6.0.3",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "concurrently": "^9.2.0",
+    "supertest": "^7.1.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3"
+  }
+}
