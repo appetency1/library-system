@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   root: fileURLToPath(new URL(".", import.meta.url)),
   plugins: [vue()],
+  build: {
+    chunkSizeWarningLimit: 800
+  },
   server: {
     port: 5173
   }
