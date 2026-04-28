@@ -75,5 +75,7 @@ describe("api integration", () => {
 
     expect(response.body).toHaveLength(1);
     expect(response.body[0].status).toBe("expired");
+    expect(response.body[0].room_name).toBe("第一阅览室");
+    expect(response.body[0].seat_no).toBe("A-01");
   });
 });

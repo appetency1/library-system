@@ -41,6 +41,9 @@ export interface Reservation {
   checkout_at: string | null;
   cancelled_at: string | null;
   created_at: string;
+  room_name?: string;
+  room_location?: string;
+  seat_no?: string;
 }
 
 export interface CreateReservationPayload {

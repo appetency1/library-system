@@ -401,6 +401,38 @@ label span {
   min-width: 150px;
 }
 
+.reservation-filter-strip {
+  align-items: end;
+}
+
+.reservation-keyword {
+  flex: 1 1 240px;
+  min-width: min(100%, 280px);
+}
+
+.reservation-summary {
+  align-items: end;
+}
+
+.reservation-card {
+  align-items: start;
+}
+
+.reservation-main,
+.reservation-meta {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.reservation-main h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.reservation-meta p {
+  margin: 0;
+}
+
 .time-slot-presets {
   display: grid;
   gap: 0.45rem;

@@ -313,24 +313,35 @@ export function listMyReservations(db: AppDatabase, userId: number): Reservation
     .prepare(
       `
         SELECT
-          id,
-          user_id,
-          room_id,
-          seat_id,
-          reserve_date,
-          start_time,
-          end_time,
-          status,
-          checkin_at,
-          checkout_at,
-          cancelled_at,
-          created_at
+          reservations.id,
+          reservations.user_id,
+          reservations.room_id,
+          reservations.seat_id,
+          reservations.reserve_date,
+          reservations.start_time,
+          reservations.end_time,
+          reservations.status,
+          reservations.checkin_at,
+          reservations.checkout_at,
+          reservations.cancelled_at,
+          reservations.created_at,
+          rooms.name AS room_name,
+          rooms.location AS room_location,
+          seats.seat_no AS seat_no
         FROM reservations
-        WHERE user_id = ?
-        ORDER BY reserve_date DESC, start_time DESC, id DESC
+        JOIN rooms ON rooms.id = reservations.room_id
+        JOIN seats ON seats.id = reservations.seat_id
+        WHERE reservations.user_id = ?
+        ORDER BY reservations.reserve_date DESC, reservations.start_time DESC, reservations.id DESC
       `
     )
-    .all(userId) as ReservationRow[];
+    .all(userId) as Array<
+    ReservationRow & {
+      room_name: string;
+      room_location: string;
+      seat_no: string;
+    }
+  >;
 }
 
 export function markExpiredReservations(db: AppDatabase): number {
