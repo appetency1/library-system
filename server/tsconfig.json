@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
     "target": "ES2022",
     "outDir": "../dist/server",
-    "rootDir": "./src",
+    "rootDir": ".",
     "types": ["node"],
     "noEmit": false,
     "esModuleInterop": true,

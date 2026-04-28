@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 import Database from "better-sqlite3";
-import type { Database as BetterSqliteDatabase } from "better-sqlite3";
 
-export type AppDatabase = BetterSqliteDatabase;
+export type AppDatabase = any;
 
 export function openDb(filePath: string): AppDatabase {
   const db = new Database(filePath);

@@ -32,7 +32,7 @@ export function listUsers(db: AppDatabase): PublicUser[] {
       `
     )
     .all()
-    .map((row) => toPublicUser(row as UserRow));
+    .map((row: UserRow) => toPublicUser(row));
 }
 
 export function setUserStatus(
