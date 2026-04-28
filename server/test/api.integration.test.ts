@@ -78,4 +78,41 @@ describe("api integration", () => {
     expect(response.body[0].room_name).toBe("第一阅览室");
     expect(response.body[0].seat_no).toBe("A-01");
   });
+
+  it("returns room and seat details for admin reservation management", async () => {
+    db.prepare(
+      `
+        INSERT INTO reservations (
+          user_id,
+          room_id,
+          seat_id,
+          reserve_date,
+          start_time,
+          end_time,
+          status,
+          checkin_at,
+          checkout_at,
+          cancelled_at,
+          created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, 'reserved', NULL, NULL, NULL, ?)
+      `
+    ).run(1, 1, 10, "2026-05-01", "08:00", "10:00", new Date().toISOString());
+
+    const loginResponse = await request(app)
+      .post("/api/auth/login")
+      .send({ username: "admin", password: "Admin123!" })
+      .expect(200);
+
+    const token = loginResponse.body.token as string;
+
+    const response = await request(app)
+      .get("/api/admin/reservations")
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200);
+
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0].room_name).toBe("第一阅览室");
+    expect(response.body[0].seat_no).toBe("A-01");
+  });
 });
