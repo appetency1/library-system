@@ -40,7 +40,7 @@ describe("reservation.service", () => {
 
     expect(() =>
       reserveSeat(db, {
-        userId: 2,
+        userId: 3,
         seatId: 10,
         reserveDate: "2026-05-01",
         startTime: "09:00",

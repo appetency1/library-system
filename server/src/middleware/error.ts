@@ -7,7 +7,7 @@ const conflictMessages = new Set([
   "SEAT_UNAVAILABLE"
 ]);
 
-const forbiddenMessages = new Set(["FORBIDDEN"]);
+const forbiddenMessages = new Set(["FORBIDDEN", "USER_ROLE_FORBIDDEN"]);
 
 const notFoundMessages = new Set([
   "USER_NOT_FOUND",
@@ -63,4 +63,3 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, next) => {
 
   res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
 };
-

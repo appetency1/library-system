@@ -140,6 +140,9 @@ export function reserveSeat(
   if (user.status !== "active") {
     throw new Error("USER_DISABLED");
   }
+  if (user.role !== "student") {
+    throw new Error("USER_ROLE_FORBIDDEN");
+  }
 
   const seat = getSeatWithRoom(db, input.seatId);
   if (!seat) {

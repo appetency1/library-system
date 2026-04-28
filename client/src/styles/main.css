@@ -443,4 +443,8 @@ label span {
     grid-template-columns: 1fr;
     align-items: start;
   }
+
+  .list-row {
+    flex-direction: column;
+  }
 }

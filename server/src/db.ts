@@ -111,6 +111,16 @@ export function seedDatabase(db: AppDatabase): void {
     created_at: now
   });
 
+  insertUser.run({
+    id: 3,
+    username: "student2",
+    password_hash: studentHash,
+    name: "学生二号",
+    role: "student",
+    status: "active",
+    created_at: now
+  });
+
   const insertRoom = db.prepare(`
     INSERT INTO rooms (id, name, location, description, status, created_at)
     VALUES (@id, @name, @location, @description, @status, @created_at)
@@ -139,50 +149,28 @@ export function seedDatabase(db: AppDatabase): void {
     VALUES (@id, @room_id, @seat_no, @type, @status, @created_at)
   `);
 
-  insertSeat.run({
-    id: 10,
-    room_id: 1,
-    seat_no: "A-01",
-    type: "普通座",
-    status: "active",
-    created_at: now
-  });
+  const seats = [
+    ...Array.from({ length: 8 }, (_, index) => ({
+      id: 10 + index,
+      room_id: 1,
+      seat_no: `A-${String(index + 1).padStart(2, "0")}`,
+      type: index % 3 === 2 ? "电源座" : "普通座",
+      status: "active",
+      created_at: now
+    })),
+    ...Array.from({ length: 8 }, (_, index) => ({
+      id: 20 + index,
+      room_id: 2,
+      seat_no: `B-${String(index + 1).padStart(2, "0")}`,
+      type: index % 2 === 0 ? "靠窗座" : "普通座",
+      status: "active",
+      created_at: now
+    }))
+  ];
 
-  insertSeat.run({
-    id: 11,
-    room_id: 1,
-    seat_no: "A-02",
-    type: "普通座",
-    status: "active",
-    created_at: now
-  });
-
-  insertSeat.run({
-    id: 12,
-    room_id: 1,
-    seat_no: "A-03",
-    type: "电源座",
-    status: "active",
-    created_at: now
-  });
-
-  insertSeat.run({
-    id: 20,
-    room_id: 2,
-    seat_no: "B-01",
-    type: "靠窗座",
-    status: "active",
-    created_at: now
-  });
-
-  insertSeat.run({
-    id: 21,
-    room_id: 2,
-    seat_no: "B-02",
-    type: "靠窗座",
-    status: "active",
-    created_at: now
-  });
+  for (const seat of seats) {
+    insertSeat.run(seat);
+  }
 
   const insertNotice = db.prepare(`
     INSERT INTO notices (id, title, content, status, created_at)
