@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
+import { getApiErrorMessage } from "../api/error";
 import { useAuthStore } from "../stores/auth";
 
 const auth = useAuthStore();
@@ -21,8 +22,7 @@ async function submit() {
     await auth.register(form);
     router.push("/app/dashboard");
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : "注册失败，请检查输入。";
+    errorMessage.value = getApiErrorMessage(error, "注册失败，请检查输入。");
   } finally {
     loading.value = false;
   }

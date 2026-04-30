@@ -299,6 +299,14 @@ export function updateNotice(
   return notice;
 }
 
+export function deleteNotice(db: AppDatabase, noticeId: number): void {
+  const result = db.prepare("DELETE FROM notices WHERE id = ?").run(noticeId);
+
+  if (result.changes === 0) {
+    throw new Error("NOTICE_NOT_FOUND");
+  }
+}
+
 export function getAdminStats(db: AppDatabase): AdminStats {
   const today = todayDate();
   const todayReservations = db

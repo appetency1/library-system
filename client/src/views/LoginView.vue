@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { useRouter, RouterLink } from "vue-router";
+import { getApiErrorMessage } from "../api/error";
 import { useAuthStore } from "../stores/auth";
 
 const auth = useAuthStore();
@@ -20,8 +21,7 @@ async function submit() {
     const session = await auth.login(form);
     router.push(session.user.role === "admin" ? "/admin/dashboard" : "/app/dashboard");
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : "登录失败，请检查账号和密码。";
+    errorMessage.value = getApiErrorMessage(error, "登录失败，请检查账号和密码。");
   } finally {
     loading.value = false;
   }

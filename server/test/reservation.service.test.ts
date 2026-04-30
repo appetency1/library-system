@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createDatabase } from "../src/db.js";
 import { markExpiredReservations, reserveSeat } from "../src/domain/reservation.service.js";
 
@@ -7,6 +7,40 @@ describe("reservation.service", () => {
 
   beforeEach(() => {
     db = createDatabase(":memory:");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("rejects reservations that start before the current time on today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 3, 30, 20, 0, 0));
+
+    expect(() =>
+      reserveSeat(db, {
+        userId: 1,
+        seatId: 10,
+        reserveDate: "2026-04-30",
+        startTime: "19:00",
+        endTime: "20:00"
+      })
+    ).toThrowError("RESERVATION_TIME_PASSED");
+  });
+
+  it("rejects reservations before today", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 3, 30, 20, 0, 0));
+
+    expect(() =>
+      reserveSeat(db, {
+        userId: 1,
+        seatId: 10,
+        reserveDate: "2026-04-29",
+        startTime: "21:00",
+        endTime: "22:00"
+      })
+    ).toThrowError("RESERVATION_TIME_PASSED");
   });
 
   it("rejects two active reservations for the same user and time slot", () => {

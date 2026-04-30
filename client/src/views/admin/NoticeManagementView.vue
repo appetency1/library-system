@@ -2,14 +2,17 @@
 import { onMounted, reactive, ref } from "vue";
 import {
   createAdminNotice,
+  deleteAdminNotice,
   fetchAdminNotices,
   updateAdminNotice,
   type NoticePayload
 } from "../../api/admin";
+import { getApiErrorMessage } from "../../api/error";
 import type { Notice } from "../../api/library";
 
 const notices = ref<Notice[]>([]);
 const message = ref("");
+const deletingId = ref<number | null>(null);
 const form = reactive<NoticePayload>({
   title: "",
   content: "",
@@ -37,6 +40,23 @@ async function toggleNotice(notice: Notice) {
   });
   await loadNotices();
 }
+
+async function removeNotice(notice: Notice) {
+  if (!window.confirm("确定删除这条公告吗？")) {
+    return;
+  }
+
+  deletingId.value = notice.id;
+  try {
+    await deleteAdminNotice(notice.id);
+    await loadNotices();
+    message.value = "公告已删除。";
+  } catch (error) {
+    message.value = getApiErrorMessage(error, "公告删除失败。");
+  } finally {
+    deletingId.value = null;
+  }
+}
 </script>
 
 <template>
@@ -61,9 +81,19 @@ async function toggleNotice(notice: Notice) {
           <strong>{{ notice.title }}</strong>
           <p>{{ notice.content }}</p>
         </div>
-        <button class="secondary-button" type="button" @click="toggleNotice(notice)">
-          {{ notice.status === "published" ? "转为草稿" : "发布" }}
-        </button>
+        <div class="row-actions">
+          <button class="secondary-button" type="button" @click="toggleNotice(notice)">
+            {{ notice.status === "published" ? "转为草稿" : "发布" }}
+          </button>
+          <button
+            class="danger-button"
+            type="button"
+            :disabled="deletingId === notice.id"
+            @click="removeNotice(notice)"
+          >
+            {{ deletingId === notice.id ? "删除中..." : "删除" }}
+          </button>
+        </div>
       </article>
     </section>
   </div>

@@ -4,6 +4,7 @@ import {
   adminCancelReservation,
   fetchAdminReservations
 } from "../../api/admin";
+import { getApiErrorMessage } from "../../api/error";
 import type { Reservation } from "../../api/library";
 
 type ReservationStatusFilter = "all" | Reservation["status"];
@@ -115,7 +116,7 @@ async function cancelReservation(reservationId: number) {
     await loadReservations();
     message.value = "预约已强制取消。";
   } catch (error) {
-    message.value = error instanceof Error ? error.message : "操作失败。";
+    message.value = getApiErrorMessage(error, "操作失败，请稍后重试。");
   }
 }
 </script>
@@ -185,7 +186,7 @@ async function cancelReservation(reservationId: number) {
         </div>
 
         <div class="reservation-meta">
-          <p class="status-pill">{{ statusLabels[reservation.status] }}</p>
+          <p class="status-pill" :class="reservation.status">{{ statusLabels[reservation.status] }}</p>
         </div>
 
         <button

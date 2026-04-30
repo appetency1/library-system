@@ -3,3 +3,25 @@ node_modules/
 dist/
 *.log
 data/
+
+# IDE 配置文件
+.agents/
+.aider-desk/
+.augment/
+.claude/
+.codemods/
+.codespin/
+.codespin.md
+.codespin.studio/
+.codestudio/
+.continue/
+.cortex/
+.kilocode/
+.kiro/
+.ai/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store

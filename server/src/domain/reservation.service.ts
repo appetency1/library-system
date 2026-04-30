@@ -1,8 +1,10 @@
 import type { AppDatabase } from "../db.js";
 import {
   currentTimestamp,
+  assertValidDate,
   assertTimeWindow,
   slotsOverlap,
+  timeToMinutes,
   todayDate
 } from "./time.js";
 import type {
@@ -127,11 +129,28 @@ function ensureNoConflict(
   }
 }
 
+function assertReservableWindow(input: ReserveSeatInput, reference = new Date()): void {
+  assertValidDate(input.reserveDate);
+  assertTimeWindow(input.startTime, input.endTime);
+
+  const currentDate = todayDate(reference);
+  if (input.reserveDate < currentDate) {
+    throw new Error("RESERVATION_TIME_PASSED");
+  }
+
+  if (input.reserveDate === currentDate) {
+    const currentMinutes = reference.getHours() * 60 + reference.getMinutes();
+    if (timeToMinutes(input.startTime) < currentMinutes) {
+      throw new Error("RESERVATION_TIME_PASSED");
+    }
+  }
+}
+
 export function reserveSeat(
   db: AppDatabase,
   input: ReserveSeatInput
 ): ReservationRow {
-  assertTimeWindow(input.startTime, input.endTime);
+  assertReservableWindow(input);
 
   const user = getUser(db, input.userId);
   if (!user) {

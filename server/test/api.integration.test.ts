@@ -115,4 +115,23 @@ describe("api integration", () => {
     expect(response.body[0].room_name).toBe("第一阅览室");
     expect(response.body[0].seat_no).toBe("A-01");
   });
+  it("allows an admin to delete a notice", async () => {
+    const loginResponse = await request(app)
+      .post("/api/auth/login")
+      .send({ username: "admin", password: "Admin123!" })
+      .expect(200);
+
+    const token = loginResponse.body.token as string;
+
+    await request(app)
+      .delete("/api/admin/notices/1")
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
+
+    const remaining = db.prepare("SELECT id FROM notices WHERE id = ?").get(1) as
+      | { id: number }
+      | undefined;
+
+    expect(remaining).toBeUndefined();
+  });
 });

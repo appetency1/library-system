@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createNotice,
+  deleteNotice,
   createRoom,
   createSeat,
   getAdminStats,
@@ -155,6 +156,15 @@ export function createAdminRouter(db: AppDatabase, jwtSecret?: string): Router {
           status: String(req.body.status) as NoticeStatus
         })
       );
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.delete("/notices/:id", (req, res, next) => {
+    try {
+      deleteNotice(db, Number(req.params.id));
+      res.status(204).send();
     } catch (error) {
       next(error);
     }

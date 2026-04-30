@@ -7,6 +7,7 @@ import {
   fetchMyReservations,
   type Reservation
 } from "../api/library";
+import { getApiErrorMessage } from "../api/error";
 
 type ReservationStatusFilter = "all" | Reservation["status"];
 
@@ -133,7 +134,7 @@ async function handleAction(action: "cancel" | "checkin" | "checkout", reservati
     await loadReservations();
     message.value = "操作成功。";
   } catch (error) {
-    message.value = error instanceof Error ? error.message : "操作失败。";
+    message.value = getApiErrorMessage(error, "操作失败，请稍后重试。");
   }
 }
 </script>
@@ -206,7 +207,7 @@ async function handleAction(action: "cancel" | "checkin" | "checkout", reservati
 
         <div class="reservation-meta">
           <p>预约号 {{ reservation.id }}</p>
-          <p class="status-pill">{{ statusLabels[reservation.status] }}</p>
+          <p class="status-pill" :class="reservation.status">{{ statusLabels[reservation.status] }}</p>
         </div>
 
         <div class="row-actions">

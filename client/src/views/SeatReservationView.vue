@@ -8,6 +8,7 @@ import {
   type Room,
   type Seat
 } from "../api/library";
+import { getApiErrorMessage } from "../api/error";
 
 interface TimeSlotPreset {
   label: string;
@@ -36,6 +37,7 @@ const reserveDate = ref(formatLocalDate());
 const startTime = ref("09:00");
 const endTime = ref("11:00");
 const message = ref("");
+const messageTone = ref<"success" | "error" | "">("");
 const loading = ref(false);
 
 const selectedRoom = computed(
@@ -91,11 +93,13 @@ watch([selectedRoomId, reserveDate, startTime, endTime], async () => {
 async function submitReservation() {
   if (!selectedSeatId.value) {
     message.value = "请选择一个可用座位。";
+    messageTone.value = "error";
     return;
   }
 
   loading.value = true;
   message.value = "";
+  messageTone.value = "";
   try {
     await createReservation({
       seatId: selectedSeatId.value,
@@ -104,9 +108,11 @@ async function submitReservation() {
       endTime: endTime.value
     });
     message.value = "预约成功。";
+    messageTone.value = "success";
     await loadSeats();
   } catch (error) {
-    message.value = error instanceof Error ? error.message : "预约失败。";
+    message.value = getApiErrorMessage(error, "预约失败，请稍后重试。");
+    messageTone.value = "error";
   } finally {
     loading.value = false;
   }
@@ -190,7 +196,12 @@ async function submitReservation() {
         @select="selectedSeatId = $event"
       />
 
-      <p class="form-hint">{{ message }}</p>
+      <div v-if="message" class="reservation-feedback" :class="messageTone">
+        <span class="reservation-feedback-label">
+          {{ messageTone === "success" ? "预约成功" : "预约提示" }}
+        </span>
+        <p>{{ message }}</p>
+      </div>
     </section>
   </div>
 </template>

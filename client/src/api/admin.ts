@@ -128,3 +128,7 @@ export async function updateAdminNotice(
   const { data } = await http.patch<Notice>(`/admin/notices/${noticeId}`, payload);
   return data;
 }
+
+export async function deleteAdminNotice(noticeId: number): Promise<void> {
+  await http.delete(`/admin/notices/${noticeId}`);
+}
