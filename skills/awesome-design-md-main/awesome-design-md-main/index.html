@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awesome Design.md — 精选设计系统预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #e5e5e5; min-height: 100vh; }
+  header { padding: 48px 32px 32px; border-bottom: 1px solid #222; }
+  .badge { display: inline-block; background: #10b981; color: #000; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px; letter-spacing: 0.5px; }
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #fff 0%, #888 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .subtitle { color: #666; font-size: 0.95rem; margin-bottom: 20px; }
+  .search-wrap { max-width: 600px; }
+  .search { width: 100%; padding: 12px 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+  .search:focus { border-color: #10b981; }
+  .search::placeholder { color: #555; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; padding: 32px; }
+  .card { background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px; transition: all 0.2s; cursor: pointer; text-decoration: none; color: inherit; display: block; }
+  .card:hover { border-color: #10b981; background: #141414; transform: translateY(-2px); }
+  .card-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 6px; color: #fff; }
+  .card-desc { font-size: 0.8rem; color: #555; margin-bottom: 12px; line-height: 1.5; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; padding: 2px 8px; background: #1c1c1c; border: 1px solid #2a2a2a; border-radius: 4px; color: #888; }
+  .count { padding: 0 32px 16px; color: #444; font-size: 0.85rem; }
+  .section-title { padding: 24px 32px 0; font-size: 0.75rem; font-weight: 600; color: #555; letter-spacing: 1px; text-transform: uppercase; }
+  .no-results { padding: 48px 32px; text-align: center; color: #444; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">DESIGN.md Collection</div>
+  <h1>Awesome Design.md</h1>
+  <p class="subtitle">55 个精选网站设计系统 · 可直接给 AI Agent 使用</p>
+  <div class="search-wrap">
+    <input class="search" type="text" id="search" placeholder="搜索设计系统名称，如 notion、linear、stripe…" oninput="filterCards(this.value)">
+  </div>
+</header>
+<p class="count" id="count"></p>
+<div class="grid" id="grid"></div>
+<script>
+const designs = [
+{name:'airbnb',desc:'温馨、友好、旅行感，柔和圆角与人情味设计',tags:['民宿','旅行']},
+{name:'airtable',desc:'灵活数据库+电子表格，模块化卡片式界面',tags:['数据库','效率']},
+{name:'apple',desc:'极致简洁、大量留白、高端科技感',tags:['科技','高端']},
+{name:'bmw',desc:'德系豪华汽车官网，精致光影与深邃质感',tags:['汽车','豪华']},
+{name:'cal',desc:'Calendly风格，简洁预约排期界面',tags:['日历','预约']},
+{name:'claude',desc:'Anthropic旗下AI助手，极简白底+优雅紫',tags:['AI','对话']},
+{name:'clay',desc:'高端B2B销售CRM，精致卡片与渐变',tags:['CRM','销售']},
+{name:'clickhouse',desc:'数据库产品，技术感深色界面',tags:['数据库','技术']},
+{name:'cohere',desc:'AI初创公司，现代科技感深蓝+白色',tags:['AI','技术']},
+{name:'coinbase',desc:'加密货币交易所，专业金融深色界面',tags:['金融','加密']},
+{name:'composio',desc:'AI Agent工具平台，现代深色UI',tags:['AI工具','开发']},
+{name:'cursor',desc:'AI代码编辑器官网，深色沉浸式体验',tags:['AI','开发']},
+{name:'elevenlabs',desc:'AI语音合成，渐变深色+科技感',tags:['AI','音频']},
+{name:'expo',desc:'React Native开发平台，简洁技术文档风格',tags:['开发','移动']},
+{name:'figma',desc:'设计协作工具，标志性的深色+紫灰',tags:['设计','协作']},
+{name:'framer',desc:'无代码建站工具，艺术感深色着陆页',tags:['建站','无代码']},
+{name:'hashicorp',desc:'DevOps工具厂商，蓝色技术文档风格',tags:['DevOps','技术']},
+{name:'ibm',desc:'蓝色巨人企业风格，国际化专业设计',tags:['企业','科技']},
+{name:'intercom',desc:'客户沟通平台，友好绿色品牌色',tags:['客服','沟通']},
+{name:'kraken',desc:'加密货币交易所，海怪深色品牌',tags:['加密','金融']},
+{name:'linear.app',desc:'问题追踪神器，深色极简工程美学',tags:['项目管理','极简']},
+{name:'lovable',desc:'AI无代码建站，温暖现代感',tags:['建站','AI']},
+{name:'minimax',desc:'AI大模型公司，现代科技风格',tags:['AI','大模型']},
+{name:'mintlify',desc:'文档站点生成器，简洁现代文档',tags:['文档','开发']},
+{name:'miro',desc:'在线白板协作，创意工作空间',tags:['协作','白板']},
+{name:'mistral.ai',desc:'法国AI实验室，极简法式优雅',tags:['AI','国际']},
+{name:'mongodb',desc:'文档数据库，绿色技术品牌',tags:['数据库','NoSQL']},
+{name:'notion',desc:'笔记与协作工具，温暖纸张质感极简',tags:['笔记','协作']},
+{name:'nvidia',desc:'GPU芯片巨头，深绿科技黑+光效',tags:['芯片','科技']},
+{name:'ollama',desc:'本地AI模型运行，简约开发者工具',tags:['AI','本地']},
+{name:'opencode.ai',desc:'AI代码平台，现代开发者UI',tags:['AI','代码']},
+{name:'pinterest',desc:'图片社交平台，明亮活泼红白',tags:['社交','图片']},
+{name:'posthog',desc:'产品分析平台，温暖黄色品牌',tags:['分析','产品']},
+{name:'raycast',desc:'macOS效率工具，简约深色工具感',tags:['效率','工具']},
+{name:'replicate',desc:'AI模型云托管，简洁开发者平台',tags:['AI','云']},
+{name:'resend',desc:'邮件API服务，极简开发者邮件工具',tags:['邮件','API']},
+{name:'revolut',desc:'数字银行，现代金融科技感',tags:['金融','银行']},
+{name:'runwayml',desc:'AI视频生成，前沿创意技术',tags:['AI','视频']},
+{name:'sanity',desc:'无头CMS平台，内容优先设计',tags:['CMS','内容']},
+{name:'sentry',desc:'错误追踪平台，开发者工具深色',tags:['开发','监控']},
+{name:'spacex',desc:'SpaceX官网，太空探索深色沉浸',tags:['航天','探索']},
+{name:'spotify',desc:'音乐流媒体，绿色品牌深色模式',tags:['音乐','流媒体']},
+{name:'stripe',desc:'支付API平台，极致精致开发者文档',tags:['支付','金融']},
+{name:'supabase',desc:'开源Firebase替代，渐变深色技术',tags:['后端','开源']},
+{name:'superhuman',desc:'极速邮件客户端，奢华高端定位',tags:['邮件','高端']},
+{name:'together.ai',desc:'AI云平台，渐变深色开发者UI',tags:['AI','云']},
+{name:'uber',desc:'出行巨头，精致黑白企业风格',tags:['出行','企业']},
+{name:'vercel',desc:'前端部署平台，极简深色开发者美学',tags:['部署','前端']},
+{name:'voltagent',desc:'VoltAgent自家官网，极简技术感',tags:['AI','Agent']},
+{name:'warp',desc:'AI终端应用，现代终端美学',tags:['终端','AI']},
+{name:'webflow',desc:'无代码建站，清晰蓝色教学风格',tags:['建站','无代码']},
+{name:'wise',desc:'国际汇款平台，简洁透明金融UI',tags:['金融','汇款']},
+{name:'x.ai',desc:'AI日程助手，简洁任务管理',tags:['AI','日程']},
+{name:'zapier',desc:'自动化平台，经典蓝白效率工具',tags:['自动化','效率']},
+];
+
+function renderDesigns(filter) {
+  const grid = document.getElementById('grid');
+  const filtered = designs.filter(d => !filter || d.name.includes(filter.toLowerCase()) || d.desc.includes(filter));
+  document.getElementById('count').textContent = `共 ${filtered.length} 个设计系统`;
+  grid.innerHTML = filtered.length ? filtered.map(d => `
+    <a class="card" href="design-md/${d.name}/preview.html" target="_blank">
+      <div class="card-name">${d.name}${d.name==='linear.app'?' (Linear)':''}</div>
+      <div class="card-desc">${d.desc}</div>
+      <div class="card-tags">${d.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </a>`).join('') : '<div class="no-results">没有找到匹配的设计系统</div>';
+}
+function filterCards(v) { renderDesigns(v); }
+renderDesigns('');
+</script>
+</body>
+</html>
