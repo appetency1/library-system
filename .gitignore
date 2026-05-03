@@ -2,7 +2,9 @@
 node_modules/
 dist/
 *.log
-data/
+
+# 保留数据库文件（确保可以直接运行）
+# data/ - 不忽略，包含数据库
 
 # IDE 配置文件
 .agents/
