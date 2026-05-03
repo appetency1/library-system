@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { getApiErrorMessage } from "../api/error";
 import { useAuthStore } from "../stores/auth";
+import AnimatedLoginPanel from "../components/AnimatedLoginPanel.vue";
 
 const auth = useAuthStore();
 const router = useRouter();
 const errorMessage = ref("");
 const loading = ref(false);
 
-const form = reactive({
-  username: "student1",
-  password: "Password123!"
-});
+const showPassword = ref(false);
+const username = ref("");
+const password = ref("");
+const isTyping = ref(false);
 
 async function submit() {
   errorMessage.value = "";
   loading.value = true;
   try {
-    const session = await auth.login(form);
+    const session = await auth.login({ username: username.value, password: password.value });
     router.push(session.user.role === "admin" ? "/admin/dashboard" : "/app/dashboard");
   } catch (error) {
     errorMessage.value = getApiErrorMessage(error, "登录失败，请检查账号和密码。");
@@ -29,28 +30,68 @@ async function submit() {
 </script>
 
 <template>
-  <div class="auth-shell">
-    <form class="auth-panel" @submit.prevent="submit">
-      <p class="eyebrow">学生登录</p>
-      <h1>进入座位预约系统</h1>
-
-      <label>
-        <span>账号</span>
-        <input v-model="form.username" autocomplete="username" />
-      </label>
-
-      <label>
-        <span>密码</span>
-        <input v-model="form.password" type="password" autocomplete="current-password" />
-      </label>
-
-      <p v-if="errorMessage" class="form-error">{{ errorMessage }}</p>
-
-      <button class="primary-button" type="submit" :disabled="loading">
-        {{ loading ? "登录中..." : "登录" }}
-      </button>
-
-      <RouterLink class="ghost-link" to="/register">没有账号，去注册</RouterLink>
-    </form>
+  <div class="login-page">
+    <!-- Global Star Background -->
+    <div class="star-bg"></div>
+    
+    <AnimatedLoginPanel
+      :show-password="showPassword"
+      :password="password"
+      :username="username"
+      :is-typing="isTyping"
+      @update:show-password="showPassword = $event"
+      @update:password="password = $event"
+      @update:username="username = $event"
+      @update:is-typing="isTyping = $event"
+      @submit="submit"
+    />
   </div>
 </template>
+
+<style scoped>
+.login-page {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Global Star Background */
+.star-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(108, 63, 245, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    #0a0f1a;
+  pointer-events: none;
+}
+
+.star-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, white, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, white, transparent),
+    radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 230px 80px, white, transparent),
+    radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1px 1px at 350px 200px, white, transparent),
+    radial-gradient(2px 2px at 420px 50px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 500px 180px, white, transparent),
+    radial-gradient(2px 2px at 580px 90px, rgba(255,255,255,0.9), transparent);
+  background-repeat: repeat;
+  background-size: 600px 250px;
+}
+</style>
